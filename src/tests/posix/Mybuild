@@ -15,6 +15,7 @@ module all {
 	depends sleep_test
 	depends sigchld_test
 	depends waitpid_test
+	depends msg_test
 }
 
 module environ_test {
@@ -123,5 +124,11 @@ module waitpid_test {
 	source "waitpid_test.c"
 
 	depends embox.compat.posix.proc.waitpid
+}
+
+module msg_test {
+	source "msg_test.c"
+
+	depends embox.kernel.thread.thread_msg
 }
 
