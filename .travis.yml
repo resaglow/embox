@@ -7,8 +7,6 @@ cache:
 
 env:
   global:
-    # Encrypted COVERITY_SCAN_TOKEN
-    - secure: KKhG29VpIOr5mq9xHptpDSfFEcSRKB8BX4e5zL0VQNJGkrNAHJ7ba+boHKEmSJJ1fZvHC18XOb886BIsn0i+lFrVymYDR8L8ca3e/k26LktnqMn76ORK1WYkD1fiRg3lX25v/j0TkoLB7pmDnMhZyGzg20675V1sHbl/KCO1LJI=
     - AUTOQEMU_NICS=''
   matrix:
     - TEMPLATE=arm/qemu
@@ -33,28 +31,7 @@ before_script:
   - make confload-"$TEMPLATE"
   - sed -ie '/eth0\|http/d' conf/start_script.inc  # FIXME
   - make buildgen  # Make as much as possible before the actual build step.
-  - |
-    if [ "${COVERITY_SCAN_BRANCH}" != 1 ]
-    then
-      function run() { echo -e '$' "${ANSI_GREEN}$@${ANSI_RESET}"; "$@"; }
-    else
-      function run() { echo "Not running '$@': Coverity scan build"; }
-    fi
 
 script:
-  - run make && run ./scripts/continuous/run.sh "$TEMPLATE"
+  - make && ./scripts/continuous/run.sh "$TEMPLATE"
 
-addons:
-  coverity_scan:
-    project:
-      name: "embox/embox"
-      description: "Build submitted via Travis CI"
-    notification_email: eldar.abusalimov@gmail.com
-    build_command: make
-    branch_pattern: coverity
-
-notifications:
-  slack:
-    secure: XIP8diNjLokES+oeQJtSQLiGAGxvqlBdoKZqccLsOZWtYToDMoNlILAurNI9wCkb1i9TmNbaNYaGqm4h6jbt/+2gOsi6u1Nu4QpTF+g294hqgE4ztxmqcX7JSOGldLxdG+o+eu6D+yUEwFbrBA0WSEVgB26Sd3JQ0jvnxAk4sJw=
-    on_success: change
-    on_failure: always
